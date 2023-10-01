@@ -72,7 +72,7 @@ dependencyManagement {
 
 compileJava {
 	options.compilerArgs += [
-			'-Amapstruct.defaultComponentModel=default'
+		'-Amapstruct.defaultComponentModel=default'
 	]
 }
 
@@ -82,12 +82,12 @@ tasks.named('test') {
 
 gitProperties {
 	keys = [
-			'git.branch',
-			'git.commit.id',
-			'git.commit.user.email',
-			'git.commit.user.name',
-			'git.commit.time',
-			'git.build.version',
-			'git.tags'
+		'git.branch',
+		'git.commit.id',
+		'git.commit.user.email',
+		'git.commit.user.name',
+		'git.commit.time',
+		'git.build.version',
+		'git.tags'
 	]
 }
