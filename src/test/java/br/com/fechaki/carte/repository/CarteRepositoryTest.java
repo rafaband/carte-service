@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MongoDBContainer;
@@ -121,9 +123,11 @@ class CarteRepositoryTest {
                 .build();
         CarteEntity result2 = repository.insert(entity2).block();
 
+        PageRequest pageable = PageRequest.of(0, 10);
+
         assert result1 != null;
         assert result2 != null;
-        StepVerifier.create(repository.findAllByDeletedFalseAndIdPlace(ID_PLACE))
+        StepVerifier.create(repository.findAllByDeletedFalseAndIdPlace(ID_PLACE, pageable))
                 .expectNextCount(2)
                 .verifyComplete();
     }
