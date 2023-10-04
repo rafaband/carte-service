@@ -1,5 +1,9 @@
 package br.com.fechaki.carte.v1.service;
 
+import br.com.fechaki.carte.exception.type.CarteNotExistException;
+import br.com.fechaki.carte.exception.type.CarteNotFoundException;
+import br.com.fechaki.carte.exception.type.CarteNotUpdatedException;
+import br.com.fechaki.carte.exception.type.NoActivatedCarteException;
 import br.com.fechaki.carte.repository.CarteRepository;
 import br.com.fechaki.carte.v1.data.entity.CarteEntity;
 import br.com.fechaki.carte.v1.service.impl.CarteServiceImpl;
@@ -19,6 +23,7 @@ import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
 class CarteServiceTest {
@@ -84,13 +89,22 @@ class CarteServiceTest {
         Mockito.when(repository.findOneByDeletedFalseAndIdPlaceAndId(ID_PLACE, ID_CARTE)).thenReturn(Mono.just(entity));
 
         StepVerifier.create(service.read(ID_PLACE, ID_CARTE))
-                .assertNext(item -> {
-                    assertEquals(ID_CARTE, item.getId());
-                    assertEquals(ID_PLACE, item.getIdPlace());
-                    assertEquals(CARTE_TITLE, item.getTitle());
-                    assertEquals(Instant.EPOCH, item.getStartDate());
-                })
-                .verifyComplete();
+        .assertNext(item -> {
+            assertEquals(ID_CARTE, item.getId());
+            assertEquals(ID_PLACE, item.getIdPlace());
+            assertEquals(CARTE_TITLE, item.getTitle());
+            assertEquals(Instant.EPOCH, item.getStartDate());
+        })
+        .verifyComplete();
+    }
+
+    @Test
+    void readNotFound() {
+        Mockito.when(repository.findOneByDeletedFalseAndIdPlaceAndId(anyString(), anyString())).thenReturn(Mono.empty());
+
+        StepVerifier.create(service.read(ID_PLACE, ID_CARTE))
+        .expectError(CarteNotFoundException.class)
+        .verify();
     }
 
     @Test
@@ -100,13 +114,22 @@ class CarteServiceTest {
         Mockito.when(repository.findOneByDeletedFalseAndActivatedTrueAndIdPlace(ID_PLACE)).thenReturn(Mono.just(entity));
 
         StepVerifier.create(service.readCurrent(ID_PLACE))
-                .assertNext(item -> {
-                    assertEquals(ID_CARTE, item.getId());
-                    assertEquals(ID_PLACE, item.getIdPlace());
-                    assertEquals(CARTE_TITLE, item.getTitle());
-                    assertEquals(Instant.EPOCH, item.getStartDate());
-                })
-                .verifyComplete();
+        .assertNext(item -> {
+            assertEquals(ID_CARTE, item.getId());
+            assertEquals(ID_PLACE, item.getIdPlace());
+            assertEquals(CARTE_TITLE, item.getTitle());
+            assertEquals(Instant.EPOCH, item.getStartDate());
+        })
+        .verifyComplete();
+    }
+
+    @Test
+    void readCurrentNoActivatedCarte() {
+        Mockito.when(repository.findOneByDeletedFalseAndActivatedTrueAndIdPlace(anyString())).thenReturn(Mono.empty());
+
+        StepVerifier.create(service.readCurrent(ID_PLACE))
+        .expectError(NoActivatedCarteException.class)
+        .verify();
     }
 
     @Test
@@ -118,11 +141,23 @@ class CarteServiceTest {
         Mockito.when(repository.count()).thenReturn(Mono.just(1L));
 
         StepVerifier.create(service.readAll(ID_PLACE, pageRequest))
-                .assertNext(item -> {
-                    assertEquals(1, item.getTotalElements());
-                    assertEquals(1, item.getTotalPages());
-                })
-                .verifyComplete();
+        .assertNext(item -> {
+            assertEquals(1, item.getTotalElements());
+            assertEquals(1, item.getTotalPages());
+        })
+        .verifyComplete();
+    }
+
+    @Test
+    void readAllNotFound() {
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
+        Mockito.when(repository.findAllByDeletedFalseAndIdPlace(ID_PLACE, pageRequest)).thenReturn(Flux.empty());
+        Mockito.when(repository.count()).thenReturn(Mono.just(0L));
+
+        StepVerifier.create(service.readAll(ID_PLACE, pageRequest))
+        .expectError(CarteNotFoundException.class)
+        .verify();
     }
 
     @Test
@@ -134,13 +169,35 @@ class CarteServiceTest {
         Mockito.when(repository.save(any(CarteEntity.class))).thenReturn(Mono.just(updatedEntity));
 
         StepVerifier.create(service.update(ID_PLACE, ID_CARTE, updatedEntity))
-                .assertNext(item -> {
-                    assertEquals(ID_CARTE, item.getId());
-                    assertEquals(ID_PLACE, item.getIdPlace());
-                    assertEquals(String.format("%s 1", CARTE_TITLE), item.getTitle());
-                    assertEquals(Instant.EPOCH, item.getStartDate());
-                })
-                .verifyComplete();
+        .assertNext(item -> {
+            assertEquals(ID_CARTE, item.getId());
+            assertEquals(ID_PLACE, item.getIdPlace());
+            assertEquals(String.format("%s 1", CARTE_TITLE), item.getTitle());
+            assertEquals(Instant.EPOCH, item.getStartDate());
+        })
+        .verifyComplete();
+    }
+
+    @Test
+    void updateNotExist() {
+        CarteEntity updatedEntity = createUpdatedEntity();
+
+        Mockito.when(repository.findOneByDeletedFalseAndIdPlaceAndId(ID_PLACE, ID_CARTE)).thenReturn(Mono.empty());
+
+        StepVerifier.create(service.update(ID_PLACE, ID_CARTE, updatedEntity))
+        .expectError(CarteNotExistException.class)
+        .verify();
+    }
+
+    @Test
+    void updateNotDone() {
+        CarteEntity entity = createEntity();
+
+        Mockito.when(repository.findOneByDeletedFalseAndIdPlaceAndId(ID_PLACE, ID_CARTE)).thenReturn(Mono.just(entity));
+
+        StepVerifier.create(service.update(ID_PLACE, ID_CARTE, entity))
+        .expectError(CarteNotUpdatedException.class)
+        .verify();
     }
 
     @Test
@@ -150,15 +207,38 @@ class CarteServiceTest {
     }
 
     @Test
+    void activateNotFound() {
+        Mockito.when(repository.activateByIdPlaceAndId(ID_PLACE, ID_CARTE)).thenReturn(Mono.empty());
+        StepVerifier.create(service.activate(ID_PLACE, ID_CARTE))
+        .expectError(CarteNotExistException.class)
+        .verify();
+    }
+
+    @Test
     void deactivate() {
         Mockito.when(repository.deactivateByIdPlaceAndId(ID_PLACE, ID_CARTE)).thenReturn(Mono.just(updateResult));
         StepVerifier.create(service.deactivate(ID_PLACE, ID_CARTE)).verifyComplete();
     }
 
     @Test
+    void deactivateNotFound() {
+        Mockito.when(repository.deactivateByIdPlaceAndId(ID_PLACE, ID_CARTE)).thenReturn(Mono.empty());
+        StepVerifier.create(service.deactivate(ID_PLACE, ID_CARTE))
+        .expectError(CarteNotExistException.class)
+        .verify();
+    }
+
+    @Test
     void delete() {
         Mockito.when(repository.deleteByIdPlaceAndId(ID_PLACE, ID_CARTE)).thenReturn(Mono.just(updateResult));
         StepVerifier.create(service.delete(ID_PLACE, ID_CARTE)).verifyComplete();
+    }
 
+    @Test
+    void deleteNotFound() {
+        Mockito.when(repository.deleteByIdPlaceAndId(ID_PLACE, ID_CARTE)).thenReturn(Mono.empty());
+        StepVerifier.create(service.delete(ID_PLACE, ID_CARTE))
+        .expectError(CarteNotExistException.class)
+        .verify();
     }
 }
