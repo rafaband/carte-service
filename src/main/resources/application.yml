@@ -8,4 +8,3 @@ spring:
       label: v1
   profiles:
     active: dev
-
