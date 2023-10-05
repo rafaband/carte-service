@@ -1,6 +1,7 @@
 package br.com.fechaki.carte.v1.data.param;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
@@ -16,8 +17,7 @@ import java.util.LinkedHashSet;
 @AllArgsConstructor
 @Schema(name = "Carte", description = "Carte Object Definition")
 public class CarteParam {
-    @NotBlank
-    @Schema(description = "Your Place ID", example = "650af0e13737733c72a88262")
+    @JsonIgnore
     private String idPlace;
 
     @NotBlank
