@@ -1,6 +1,7 @@
 package br.com.fechaki.carte.v1.mapper;
 
 import br.com.fechaki.carte.v1.data.entity.CategoryEntity;
+import br.com.fechaki.carte.v1.data.model.Category;
 import br.com.fechaki.carte.v1.data.param.CategoryParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueMappingStrategy;
@@ -15,4 +16,5 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface CategoryMapper {
     CategoryEntity toEntity(CategoryParam param);
+    Category toModel(CategoryEntity entity);
 }

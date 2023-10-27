@@ -9,7 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.LinkedHashSet;
 
 @Getter
@@ -17,7 +17,8 @@ import java.util.LinkedHashSet;
 @AllArgsConstructor
 @Schema(name = "Carte", description = "Carte Object Definition")
 public class CarteParam {
-    @JsonIgnore
+    @NotBlank
+    @Schema(description =  "Place ID for Carte Identification")
     private String idPlace;
 
     @NotBlank
@@ -28,12 +29,12 @@ public class CarteParam {
     @FutureOrPresent
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     @Schema(description = "Date when the Carte should start working. It must be a Present or Future Date", example = "2023-07-03T02:20:00.000+0000")
-    private LocalDateTime startDate;
+    private Date startDate;
 
     @Future
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     @Schema(description = "Date when the Carte should be stop working. It must be a Future Date higher then start date", example = "2023-07-23T02:20:00.000+0000")
-    private LocalDateTime endDate;
+    private Date endDate;
 
     @NotNull
     @Size(min = 1, max = 10)

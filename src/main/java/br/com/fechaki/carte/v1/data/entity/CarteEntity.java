@@ -28,9 +28,11 @@ public class CarteEntity {
     private boolean activated;
     private boolean deleted;
     @CreatedDate
-    private Instant created;
+    @Builder.Default
+    private Instant created = Instant.now();
     @LastModifiedDate
-    private Instant updated;
+    @Builder.Default
+    private Instant updated = Instant.now();
     @Builder.Default()
     private LinkedHashSet<CategoryEntity> categories = new LinkedHashSet<>();
 }

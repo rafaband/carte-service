@@ -27,7 +27,7 @@ public class BaseException extends RuntimeException {
         this.messageType = messageType;
     }
 
-    protected final void addError(String key, Object value) {
+    public final void addError(String key, Object value) {
         errors.put(key, value);
     }
 

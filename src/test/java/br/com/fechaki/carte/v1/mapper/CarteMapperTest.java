@@ -9,6 +9,7 @@ import org.mapstruct.factory.Mappers;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +24,7 @@ class CarteMapperTest {
         CarteParam carteParam = new CarteParam(
                 ID_PLACE,
                 CARTE_TITLE,
-                LocalDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC),
+                Date.from(Instant.EPOCH),
                 null,
                 null);
 
