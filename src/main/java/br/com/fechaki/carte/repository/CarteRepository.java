@@ -9,9 +9,10 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface CarteRepository extends ReactiveMongoRepository<CarteEntity, String>, CarteUpdateRepository {
-    Mono<CarteEntity> findOneByDeletedFalseAndActivatedTrueAndIdPlace(String idPlace);
+    Mono<CarteEntity> findOneByIdPlaceAndDeletedFalseAndActivatedTrue(String idPlace);
+    Mono<CarteEntity> findOneByIdPlace(String idPlace);
 
-    Flux<CarteEntity> findAllByDeletedFalseAndIdPlace(String idPlace, Pageable pageable);
+    Flux<CarteEntity> findAllByIdPlaceAndDeletedFalse(String idPlace, Pageable pageable);
 
-    Mono<CarteEntity> findOneByDeletedFalseAndIdPlaceAndId(String idPlace, String idCarte);
+    Mono<CarteEntity> findOneByIdPlaceAndIdAndDeletedFalse(String idPlace, String idCarte);
 }
