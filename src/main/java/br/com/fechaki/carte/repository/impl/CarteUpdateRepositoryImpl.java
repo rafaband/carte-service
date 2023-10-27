@@ -15,42 +15,32 @@ import reactor.core.publisher.Mono;
 public class CarteUpdateRepositoryImpl implements CarteUpdateRepository {
     private final ReactiveMongoTemplate template;
 
+    private Query getDefault(String idPlace, String idCarte) {
+        return new Query(
+            Criteria
+                .where("idPlace").is(idPlace)
+                .andOperator(Criteria.where("id").is(idCarte))
+        );
+    }
+
     @Override
     public Mono<UpdateResult> deleteByIdPlaceAndId(String idPlace, String idCarte) {
-        Query query = new Query(
-                Criteria
-                        .where("idPlace").is(idPlace)
-                        .andOperator(Criteria.where("id").is(idCarte))
-        );
-
         Update update = new Update().set("deleted", true);
-        return template.updateFirst(query, update, CarteEntity.class);
+        return template.updateFirst(getDefault(idPlace, idCarte), update, CarteEntity.class);
     }
 
     @Override
     public Mono<UpdateResult> activateByIdPlaceAndId(String idPlace, String idCarte) {
-        Query query = new Query(
-                Criteria
-                        .where("idPlace").is(idPlace)
-                        .andOperator(Criteria.where("id").is(idCarte))
-        );
-
         Update update = new Update().set("activated", true);
 
         return template
                 .updateMulti(new Query(Criteria.where("idPlace").is(idPlace)), new Update().set("activated", false), CarteEntity.class)
-                .flatMap(q -> template.updateFirst(query, update, CarteEntity.class));
+                .flatMap(q -> template.updateFirst(getDefault(idPlace, idCarte), update, CarteEntity.class));
     }
 
     @Override
     public Mono<UpdateResult> deactivateByIdPlaceAndId(String idPlace, String idCarte) {
-        Query query = new Query(
-                Criteria
-                        .where("idPlace").is(idPlace)
-                        .andOperator(Criteria.where("id").is(idCarte))
-        );
-
         Update update = new Update().set("activated", false);
-        return template.updateFirst(query, update, CarteEntity.class);
+        return template.updateFirst(getDefault(idPlace, idCarte), update, CarteEntity.class);
     }
 }
