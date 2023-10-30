@@ -2,8 +2,20 @@ services:
   mongodb:
     image: 'mongo:latest'
     environment:
-      - 'MONGO_INITDB_DATABASE=mydatabase'
-      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
-      - 'MONGO_INITDB_ROOT_USERNAME=root'
+      - 'MONGO_INITDB_DATABASE=cartedb'
+      - 'MONGO_INITDB_ROOT_PASSWORD='
+      - 'MONGO_INITDB_ROOT_USERNAME='
     ports:
-      - '27017'
+      - '27017:27017'
+  config:
+    image: 'config:0.0.1-SNAPSHOT'
+    environment:
+      - 'CONFIG_SERVER_SEARCH_LOCATIONS=/Users/rafaband/WORKSPACES/FECHAKI/CONFIGS/{label}/{application}'
+      - 'CONFIG_SERVER_BUCKET=aws-s3-bucket'
+      - 'CONFIG_SERVER_REGION=us-east-1'
+      - 'CONFIG_SERVER_SECURITY_USERNAME=root'
+      - 'CONFIG_SERVER_SECURITY_PASSWORD=s3cr3t'
+      - 'CONFIG_SERVER_AWS_ACCESS_KEY=mykey'
+      - 'CONFIG_SERVER_AWS_SECRET_KEY=mysecret'
+    ports:
+      - '8888:8888'
