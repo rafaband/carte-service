@@ -10,7 +10,7 @@ services:
   config:
     image: 'config:0.0.1-SNAPSHOT'
     environment:
-      - 'CONFIG_SERVER_SEARCH_LOCATIONS=/Users/rafaband/WORKSPACES/FECHAKI/CONFIGS/{label}/{application}'
+      - 'CONFIG_SERVER_SEARCH_LOCATIONS=${CONFIG_SERVER_SEARCH_LOCATIONS}'
       - 'CONFIG_SERVER_BUCKET=aws-s3-bucket'
       - 'CONFIG_SERVER_REGION=us-east-1'
       - 'CONFIG_SERVER_SECURITY_USERNAME=root'
